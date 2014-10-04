@@ -1,0 +1,423 @@
+---
+title: "pfase1"
+author: "Francisco Delgado"
+date: "09/29/2014"
+output: pdf_document
+---
+
+```{r echo=FALSE}
+data <- read.csv("proyecto_fase_I_1_2014.csv", header = TRUE)
+n = length(data[1,])
+origen = data[,1]
+headers = names(data[1,])
+total=nrow(data)
+```
+-----
+#Entrada
+```{r results='asis',echo=FALSE}
+  cat("\n### Columnas\n")
+  for(i in (1:n)){
+   cat("*",headers[i],"\n")
+  }
+  cat("\n### Total de datos de entrada: ",total,"filas\n")
+```
+
+#Analisis
+
+
+### Origen
+```{r echo=FALSE}
+  h=hist(data[,1],plot=FALSE)
+  plot(h$mids,h$counts/sum(h$counts))
+  hist(data[data[,1]>0,1],labels = TRUE, col = 'skyblue', border = 'white',main="Histograma de Origen",xlab="Origen")
+  plot(ecdf(data[,1]),main="FDA")
+```
+
+* #### Resumen
+```{r echo=FALSE}
+  summary(data[data[,1]>0,1])
+```
+
+* #### Varianza
+```{r echo=FALSE}
+  var(data[,1])
+```
+
+* #### Probabilidades
+```{r echo=FALSE}
+  p =prop.table(table(data[,1]))
+  p
+```
+
+* #### Variable Aleatoria: Binomial
+Si contamos como exito el hecho de que el usuario origine su recorrido desde la estacion: 1,2 o 3; podemos relacionar los datos de entrada para la columna "Origen" como una variable aleatoria que sigue una distribucion Binomial cuyo numero de experimientos es la cantidad de filas presentes en archivo de entrada, en este caso 10.000.
+Adicionalmente, aislamos los 3 posibles escenarios donde el usuario origina su trayecto, podemos obtener tres nombres para la variable aleatoria con su respectivo parametro "p" asociado
+
+* ##### Nombre: 
+"Numero de personas que salen de la estacion 1"
+
+* ##### Parametros: 
+n = `r total`, p = `r p[1]`
+
+* ##### Nombre: 
+"Numero de personas que salen de la estacion 2"
+
+* ##### Parametros: 
+n = 1`r total`, p = `r p[2]`
+
+* ##### Nombre: 
+"Numero de personas que salen de la estacion 3"
+
+* ##### Parametros: 
+n = `r total`, p = `r p[3]`
+
+
+### Destino
+```{r echo=FALSE}
+  h=hist(data[,2],plot=FALSE)
+  plot(h$mids,h$counts/sum(h$counts))
+  hist(data[,2],labels = TRUE, col = 'skyblue', border = 'white',main="Histograma de Destino",xlab="Destino")
+  plot(ecdf(data[,2]),main="FDA")
+```
+
+* #### Resumen
+```{r echo=FALSE}
+  summary(data[data[,2]>0,2])
+```
+
+* #### Varianza
+```{r echo=FALSE}
+  var(data[,2])
+```
+* #### Probabilidades
+```{r echo=FALSE}
+  p = prop.table(table(data[,2]))
+  p
+```
+
+* #### Variable Aleatoria: Binomial
+Al igual que la columna origen, cada usuario tiene una sola estacion destino que varia entre 1 y 3, las cuales se cuentan como "exito" si llega a dicha estacion
+
+* ##### Nombre: 
+"Numero de personas que llegan a la estacion 1"
+
+* ##### Parametros: 
+n = `r total`, p = `r p[1]`
+
+* ##### Nombre: 
+"Numero de personas que llegan a la estacion 2"
+
+* ##### Parametros: 
+n = `r total`, p = `r p[2]`
+
+* ##### Nombre: 
+"Numero de personas que llegan a la estacion 3"
+
+* ##### Parametros: 
+n = `r total`, p = `r p[3]`
+
+
+## TTicket
+
+```{r echo=FALSE}
+  for(j in (1:3)){
+    m = data[data[,1]==j & data[,3]>0,]
+    hist(m[,i],labels = TRUE, col = 'skyblue', border = 'white',main=paste("Histograma con estacion ",j),xlab="TTicket")
+    plot(ecdf(m[,i]),main=paste("FDA con estacion ",j))
+  }
+```
+
+* #### Resumen (estacion 1)
+```{r echo=FALSE}
+a = summary(data[data[,1]==1 & data[,3]>0,3])
+a
+```
+* #### Resumen (estacion 2)
+```{r echo=FALSE}
+b = summary(data[data[,1]==2 & data[,3]>0,3])
+b
+```
+* #### Resumen (estacion 3)
+```{r echo=FALSE}
+c = summary(data[data[,1]==3 & data[,3]>0,3])
+c
+```
+
+* #### Variable Aleatoria: Exponencial
+Cada usuario sin ticket tarda un tiempo t en llegar a la cabina de compra del mismo. Dado que la distribucion Exponencial considera el "tiempo hasta proxima llegada", tomamos como llegada el momento en que el usuario se situa en el primer puesto de la cola para la compra del ticket.
+Cada estacion demuestra un intervalo de tiempo entre usuarios diferente. Si tomamos la media de estos intervalos de tiempo individualmente y determinamos el nombre de la variable aleatoria, obtenemos lo siguiente: 
+
+* ##### Nombre: 
+"Tiempo de espera para comprar un ticket en la estacion 1"
+
+* ##### Parametros: 
+lambda = `r a[4]`
+
+* ##### Nombre: 
+"Tiempo de espera para comprar un ticket en la estacion 2"
+
+* ##### Parametros: 
+lambda = `r b[4]`
+
+* ##### Nombre: 
+"Tiempo de espera para comprar un ticket en laestacion 3"
+
+* ##### Parametros: 
+lambda = `r c[4]`
+
+## TEscaleraAnden
+
+```{r echo=FALSE}
+  for(j in (1:3)){
+    m = data[data[,1]==j,]
+    hist(m[,i],labels = TRUE, col = 'skyblue', border = 'white',main=paste("Histograma con estacion ",j),xlab="TEscaleraAnden")
+    plot(ecdf(m[,i]),main=paste("FDA con estacion ",j))
+  }
+```
+
+* #### Resumen (estacion 1)
+```{r echo=FALSE}
+a = summary(data[data[,1]==1 & data[,4]>0,4])
+a
+```
+* #### Resumen (estacion 2)
+```{r echo=FALSE}
+b = summary(data[data[,1]==2 & data[,4]>0,4])
+b
+```
+* #### Resumen (estacion 3)
+```{r echo=FALSE}
+c = summary(data[data[,1]==3 & data[,4]>0,4])
+c
+```
+
+* #### Variable Aleatoria: Exponencial
+Cada usuario tarda un intervalo de tiempo t en llegar al anden por cada estacion, lo cual corresponde con la definicion de la distribuccion Exponencial y sus parametros. Tomando la media de estos intervalos de tiempo por estacion, tenemos lo siguiente:
+
+* ##### Nombre: 
+"Tiempo de llegada de los usuarios al anden 1"
+
+* ##### Parametros: 
+lambda = `r a[4]`
+
+* ##### Nombre: 
+"Tiempo de llegada de los usuarios al anden 2"
+
+* ##### Parametros: 
+lambda = `r b[4]`
+
+* ##### Nombre: 
+"Tiempo de llegada de los usuarios al anden 3"
+
+* ##### Parametros: 
+lambda = `r c[4]`
+
+## TAndenEscalera
+
+```{r echo=FALSE}
+  for(j in (1:3)){
+    m = data[data[,2]==j,]
+    hist(m[,i],labels = TRUE, col = 'skyblue', border = 'white',main=paste("Histograma con estacion ",j),xlab="TAndenEscalera")
+    plot(ecdf(m[,i]),main=paste("FDA con estacion ",j))
+  }
+```
+
+* #### Resumen (estacion 1)
+```{r echo=FALSE}
+a = summary(data[data[,2]==1 & data[,5]>0,5])
+a
+```
+* #### Resumen (estacion 2)
+```{r echo=FALSE}
+b = summary(data[data[,2]==2 & data[,5]>0,5])
+b
+```
+* #### Resumen (estacion 3)
+```{r echo=FALSE}
+c = summary(data[data[,2]==3 & data[,5]>0,5])
+c
+```
+
+* #### Variable Aleatoria: Exponencial
+Cada usuario tarda un intervalo de tiempo t en llegar al anden por cada estacion, lo cual corresponde con la definicion de la distribuccion Exponencial y sus parametros. Tomando la media de estos intervalos de tiempo por estacion, tenemos lo siguiente:
+
+* ##### Nombre: 
+"Tiempo de llegada de los usuarios a la escalera 1"
+
+* ##### Parametros: 
+lambda = `r a[4]`
+
+* ##### Nombre: 
+"Tiempo de llegada de los usuarios a la escalera 2"
+
+* ##### Parametros: 
+lambda = `r b[4]`
+
+* ##### Nombre: 
+"Tiempo de llegada de los usuarios a la escalera 3"
+
+* ##### Parametros: 
+lambda = `r c[4]`
+
+### T12
+```{r echo=FALSE}
+  hist(data[data[,6]>0,6],labels = TRUE, col = 'skyblue', border = 'white',main="Histograma de T12",xlab="T12")
+  plot(ecdf(data[,6]),main="FDA")
+```
+
+* #### Resumen
+```{r echo=FALSE}
+  a = summary(data[data[,6]>0,6])
+  a
+```
+
+* #### Varianza
+```{r echo=FALSE}
+  var(data[,6])
+```
+
+* #### Variable Aleatoria: Exponencial
+Cada tren tarda cierta cantidad de tiempo en llegar a una estacion, estos estan reflejados en las columnas T12, T23, T32 y T21. Dado que podemos medir el intervalo de tiempo que tarda un tren entre una estacion y otra, asociamos estas cuatro columnas con la distribucion Exponencial con un parametro lambda igual a la media de dicho intervalo por estacion
+
+* ##### Nombre: 
+"Tiempo que tarda el tren en llegar a la estacion 2 desde estacion 1"
+
+* ##### Parametros: 
+lambda = `r a[4]`
+
+### T23
+```{r echo=FALSE}
+  hist(data[data[,7]>0,7],labels = TRUE, col = 'skyblue', border = 'white',main="Histograma de T12",xlab="T23")
+  plot(ecdf(data[,7]),main="FDA")
+```
+
+* #### Resumen
+```{r echo=FALSE}
+  a = summary(data[data[,7]>0,7])
+  a
+```
+
+* #### Varianza
+```{r echo=FALSE}
+  var(data[,7])
+```
+
+* #### Variable Aleatoria: Exponencial
+
+
+* ##### Nombre: 
+"Tiempo que tarda el tren en llegar a la estacion 3 desde estacion 2"
+
+* ##### Parametros: 
+lambda = `r a[4]`
+
+### T32
+```{r echo=FALSE}
+  hist(data[data[,8]>0,8],labels = TRUE, col = 'skyblue', border = 'white',main="Histograma de T12",xlab="T32")
+  plot(ecdf(data[,8]),main="FDA")
+```
+
+* #### Resumen
+```{r echo=FALSE}
+  a = summary(data[data[,8]>0,8])
+  a
+```
+
+* #### Varianza
+```{r echo=FALSE}
+  var(data[,8])
+```
+
+* #### Variable Aleatoria: Exponencial
+
+
+* ##### Nombre: 
+"Tiempo que tarda el tren en llegar a la estacion 2 desde estacion 3"
+
+* ##### Parametros: 
+lambda = `r a[4]`
+
+### T21
+```{r echo=FALSE}
+  hist(data[data[,9]>0,9],labels = TRUE, col = 'skyblue', border = 'white',main="Histograma de T12",xlab="T21")
+  plot(ecdf(data[,9]),main="FDA")
+```
+
+* #### Resumen
+```{r echo=FALSE}
+  a = summary(data[data[,9]>0,9])
+  a
+```
+
+* #### Varianza
+```{r echo=FALSE}
+  var(data[,9])
+```
+
+* #### Variable Aleatoria: Exponencial
+
+
+* ##### Nombre: 
+"Tiempo que tarda el tren en llegar a la estacion 1 desde estacion 2"
+
+* ##### Parametros: 
+lambda = `r a[4]`
+
+
+###TTotalTren
+
+#### Tren recorre una estacion
+
+```{r echo=FALSE}
+  m = subset(data,abs(Origen-Destino)==1)
+  hist(m[,10],labels = TRUE, col = 'skyblue', border = 'white',main=paste("Histograma TTotalTren una estacion"),xlab="TTotalTren")
+```
+
+* #### Resumen
+```{r echo=FALSE}
+  a = summary(m[,i])
+  a
+
+```
+* #### Varianza
+```{r echo=FALSE}
+  var(m[,i])
+```
+
+#### Tren recorre dos estaciones
+
+```{r echo=FALSE}
+  m = subset(data,abs(Origen-Destino)==2)
+  hist(m[,10],labels = TRUE, col = 'skyblue', border = 'white',main=paste("Histograma TTotalTren dos estaciones"),xlab="TTotalTren")
+```
+
+* #### Resumen
+```{r echo=FALSE}
+  b = summary(m[,i])
+  b
+
+```
+* #### Varianza
+```{r echo=FALSE}
+  var(m[,i])
+```
+
+* #### Variable Aleatoria: Exponencial
+Dado que lo usuarios solo recorren como maximo 2 estaciones, tomamos la media de los intervalos de tiempo que el tren tarda en recorrer una y dos estaciones. Con esto, podemos medir el tiempo que tarda un tres en llegar a una estacion X dado que recorrio una o dos estaciones y asi asociar la variable aleatoria con una distribucion exponencial.
+Tendremos dos variables aleatorias asociadas a esta distribucion:
+
+* ##### Nombre: 
+"Tiempo que tarda un tren en llegar a una estacion dado que recorrio una estacione"
+
+* ##### Parametros: 
+lambda = `r a[4]`
+
+* ##### Nombre: 
+"Tiempo que tarda un tren en llegar a una estacion dado que recorrio dos estaciones"
+
+* ##### Parametros: 
+lambda = `r b[4]`
+
+
+
+
